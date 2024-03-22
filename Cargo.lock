@@ -580,12 +580,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "burn_nannou_MNIST"
+name = "burn_nannou_mnist"
 version = "0.1.0"
 dependencies = [
  "burn",
  "image 0.25.0",
  "nannou",
+ "rayon",
 ]
 
 [[package]]

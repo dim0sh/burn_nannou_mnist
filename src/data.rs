@@ -1,10 +1,11 @@
 use std::fs;
+use rayon::prelude::*;
 use image;
 use burn::{
-    data::{self, dataloader::batcher::Batcher, dataset::Dataset},
+    data::{dataloader::batcher::Batcher, dataset::Dataset},
     tensor::{backend::Backend, Data, ElementConversion, Int, Tensor},
 };
-use nannou::draw::{background::new, primitive::path};
+
 #[derive(Debug,Clone)]
 pub struct NumbersItem {
     pub number: [[f32; 28*28]; 3],
@@ -83,7 +84,7 @@ impl NumbersDataset {
         for sub_dir in dir {
             let sub_dir = sub_dir.unwrap();
             let label = sub_dir.file_name().into_string().unwrap().parse::<i32>().unwrap();
-            for image in fs::read_dir(sub_dir.path()).unwrap() {
+            let sub_numbers = fs::read_dir(sub_dir.path()).unwrap().par_bridge().map(|image| {
                 let mut item = NumbersItem {
                     number: [[0.0; 28*28]; 3],
                     label,
@@ -91,17 +92,13 @@ impl NumbersDataset {
                 let image = image.unwrap();
                 let image = image::open(image.path()).unwrap().to_rgb8();
                 for (n,pix) in image.pixels().enumerate() {
-                    if pix.0[0] > 0 {
-                        item.number[0][n] = 1.0;
-                    } else if pix.0[1] > 0 {
-                        item.number[1][n] = 1.0;
-                    } else if pix.0[2] > 0 {
-                        item.number[2][n] = 1.0;
-                    }
-    
+                    item.number[0][n] = pix.0[0] as f32;
+                    item.number[1][n] = pix.0[1] as f32;
+                    item.number[2][n] = pix.0[2] as f32;
                 }
-                numbers.push(item);
-            }
+                item
+            }).collect::<Vec<NumbersItem>>();
+            numbers.extend(sub_numbers);
         }
         numbers
     }
