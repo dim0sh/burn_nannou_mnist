@@ -16,8 +16,14 @@ fn main() {
         ),
         device.clone(),
     );
-
+    let mut positive = 0;
+    let mut all = 0;
     NumbersDataset::new("test").dataset.iter().for_each(|item| {
-        burn_nannou_mnist::inference::infer::<MyBackend>("/tmp", device.clone(), item.clone());
+        let (predicted, expected) = burn_nannou_mnist::inference::infer::<MyBackend>("/tmp", device.clone(), item.clone());
+        all += 1;
+        if predicted == expected {
+            positive += 1;
+        }
     });
+    println!("Accuracy: {}", positive as f32 / all as f32);
 }

@@ -9,7 +9,7 @@ use burn::{
     tensor::backend::Backend,
 };
 
-pub fn infer<B: Backend>(artifact_dir: &str, device: B::Device, item: NumbersItem) {
+pub fn infer<B: Backend<IntElem = i32>>(artifact_dir: &str, device: B::Device, item: NumbersItem) -> (i32, i32) {
     let config = TrainingConfig::load(format!("{artifact_dir}/config.json"))
         .expect("Config should exist for the model");
     let record = CompactRecorder::new()
@@ -24,5 +24,6 @@ pub fn infer<B: Backend>(artifact_dir: &str, device: B::Device, item: NumbersIte
     let output = model.forward(batch.numbers);
     let predicted = output.argmax(1).flatten::<1>(0, 1).into_scalar();
 
-    println!("Predicted {} Expected {}", predicted, label);
+
+    (predicted, label)
 }
