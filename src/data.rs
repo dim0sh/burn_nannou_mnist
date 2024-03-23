@@ -87,15 +87,13 @@ impl NumbersDataset {
             let sub_numbers = fs::read_dir(sub_dir.path())
                 .unwrap()
                 .par_bridge()
-                .map(|image| {
-                    NumbersDataset::parse_image(image.unwrap(),label)
-                })
+                .map(|image| NumbersDataset::parse_image(image.unwrap(), label))
                 .collect::<Vec<NumbersItem>>();
             numbers.extend(sub_numbers);
         }
         numbers
     }
-    fn parse_image(image: DirEntry,label:i32) -> NumbersItem {
+    fn parse_image(image: DirEntry, label: i32) -> NumbersItem {
         let mut item = NumbersItem {
             number: [[0.0; 28 * 28]; 3],
             label,
