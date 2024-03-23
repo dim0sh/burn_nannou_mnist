@@ -1,5 +1,6 @@
 use burn::backend::{wgpu::AutoGraphicsApi, Autodiff, Wgpu};
 use burn::optim::AdamConfig;
+use burn_nannou_mnist::data::NumbersDataset;
 use burn_nannou_mnist::model::ModelConfig;
 
 fn main() {
@@ -16,12 +17,7 @@ fn main() {
         device.clone(),
     );
 
-    // burn_nannou_mnist::inference::infer::<MyBackend>(
-    //     "/tmp",
-    //     device,
-    //     burn_nannou_mnist::data::NumbersItem {
-    //         number: [[1.0, 2.0]],
-    //         label: 1,
-    //     },
-    // );
+    NumbersDataset::new("test").dataset.iter().for_each(|item| {
+        burn_nannou_mnist::inference::infer::<MyBackend>("/tmp", device.clone(), item.clone());
+    });
 }

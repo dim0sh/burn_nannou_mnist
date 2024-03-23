@@ -4,7 +4,7 @@ use burn::{
 };
 use image;
 use rayon::prelude::*;
-use std::fs;
+use std::fs::{self, DirEntry};
 
 #[derive(Debug, Clone)]
 pub struct NumbersItem {
@@ -48,7 +48,7 @@ impl<B: Backend> Batcher<NumbersItem, NumbersBatch<B>> for NumbersBatcher<B> {
 }
 
 pub struct NumbersDataset {
-    dataset: Vec<NumbersItem>,
+    pub dataset: Vec<NumbersItem>,
 }
 
 impl Dataset<NumbersItem> for NumbersDataset {
@@ -67,7 +67,7 @@ impl NumbersDataset {
         Self { dataset }
     }
     pub fn test() -> Self {
-        NumbersDataset::new("test")
+        NumbersDataset::new("val")
     }
     pub fn train() -> Self {
         NumbersDataset::new("train")
@@ -88,22 +88,24 @@ impl NumbersDataset {
                 .unwrap()
                 .par_bridge()
                 .map(|image| {
-                    let mut item = NumbersItem {
-                        number: [[0.0; 28 * 28]; 3],
-                        label,
-                    };
-                    let image = image.unwrap();
-                    let image = image::open(image.path()).unwrap().to_rgb8();
-                    for (n, pix) in image.pixels().enumerate() {
-                        item.number[0][n] = pix.0[0] as f32;
-                        item.number[1][n] = pix.0[1] as f32;
-                        item.number[2][n] = pix.0[2] as f32;
-                    }
-                    item
+                    NumbersDataset::parse_image(image.unwrap(),label)
                 })
                 .collect::<Vec<NumbersItem>>();
             numbers.extend(sub_numbers);
         }
         numbers
+    }
+    fn parse_image(image: DirEntry,label:i32) -> NumbersItem {
+        let mut item = NumbersItem {
+            number: [[0.0; 28 * 28]; 3],
+            label,
+        };
+        let image = image::open(image.path()).unwrap().to_rgb8();
+        for (n, pix) in image.pixels().enumerate() {
+            item.number[0][n] = pix.0[0] as f32;
+            item.number[1][n] = pix.0[1] as f32;
+            item.number[2][n] = pix.0[2] as f32;
+        }
+        item
     }
 }
