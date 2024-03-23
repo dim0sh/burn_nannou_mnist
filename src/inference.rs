@@ -1,9 +1,12 @@
-use crate::{data::{NumbersBatcher, NumbersItem}, training::TrainingConfig};
+use crate::{
+    data::{NumbersBatcher, NumbersItem},
+    training::TrainingConfig,
+};
 use burn::{
-    data::dataloader::batcher::Batcher,
     config::Config,
-    tensor::backend::Backend,
+    data::dataloader::batcher::Batcher,
     record::{CompactRecorder, Recorder},
+    tensor::backend::Backend,
 };
 
 pub fn infer<B: Backend>(artifact_dir: &str, device: B::Device, item: NumbersItem) {

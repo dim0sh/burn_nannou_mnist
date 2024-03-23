@@ -1,15 +1,16 @@
 use crate::{
-    data::{NumbersBatch, NumbersBatcher, NumbersDataset}, model::{Model, ModelConfig}
+    data::{NumbersBatch, NumbersBatcher, NumbersDataset},
+    model::{Model, ModelConfig},
 };
 use burn::module::Module;
 use burn::{
+    config::Config,
     data::dataloader::DataLoaderBuilder,
     nn::loss::CrossEntropyLossConfig,
     optim::AdamConfig,
-    tensor::{backend::Backend, Int, Tensor},
     record::CompactRecorder,
     tensor::backend::AutodiffBackend,
-    config::Config,
+    tensor::{backend::Backend, Int, Tensor},
     train::{
         metric::{AccuracyMetric, LossMetric},
         ClassificationOutput, LearnerBuilder, TrainOutput, TrainStep, ValidStep,
@@ -70,9 +71,7 @@ pub fn train<B: AutodiffBackend>(artifact_dir: &str, config: TrainingConfig, dev
     B::seed(config.seed);
 
     let batcher_train = NumbersBatcher::<B>::new(device.clone());
-    let batcher_valid= NumbersBatcher::new(device.clone());
-    
-
+    let batcher_valid = NumbersBatcher::new(device.clone());
 
     let dataloader_train = DataLoaderBuilder::new(batcher_train)
         .batch_size(config.batch_size)
@@ -96,10 +95,9 @@ pub fn train<B: AutodiffBackend>(artifact_dir: &str, config: TrainingConfig, dev
             config.optimizer.init(),
             config.learning_rate,
         );
-       
+
     let model_trained = learner.fit(dataloader_train, dataloader_test);
     model_trained
         .save_file(format!("{artifact_dir}/model"), &CompactRecorder::new())
         .expect("Model should be saved successfully");
-    
 }

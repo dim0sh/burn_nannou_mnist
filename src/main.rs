@@ -1,5 +1,5 @@
+use burn::backend::{wgpu::AutoGraphicsApi, Autodiff, Wgpu};
 use burn::optim::AdamConfig;
-use burn::backend::{Autodiff, Wgpu, wgpu::AutoGraphicsApi};
 use burn_nannou_mnist::model::ModelConfig;
 
 fn main() {
@@ -9,7 +9,10 @@ fn main() {
     let device = burn::backend::wgpu::WgpuDevice::default();
     burn_nannou_mnist::training::train::<MyAutodiffBackend>(
         "/tmp",
-        burn_nannou_mnist::training::TrainingConfig::new(ModelConfig::new(10, 512), AdamConfig::new()),
+        burn_nannou_mnist::training::TrainingConfig::new(
+            ModelConfig::new(10, 512),
+            AdamConfig::new(),
+        ),
         device.clone(),
     );
 

@@ -1,5 +1,4 @@
 use burn::{
-    
     config::Config,
     module::Module,
     nn::{
