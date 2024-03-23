@@ -27,5 +27,6 @@ fn main() {
             }
     });
     let accuracy = positive.iter().zip(all.iter()).map(|(p, a)| *p as f32 / *a as f32).collect::<Vec<f32>>();
-    println!("{:?}", accuracy);
+    let total_accuracy = positive.iter().sum::<i32>() as f32 / all.iter().sum::<i32>() as f32;
+    println!("Accuracy per number: {:?}, Total Accuracy: {:?}", accuracy, total_accuracy);
 }
