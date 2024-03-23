@@ -79,7 +79,7 @@ impl NumbersDataset {
     }
     fn parse(path: &str) -> Vec<NumbersItem>{
         let mut numbers:Vec<NumbersItem> = Vec::new();
-        let dir_path = format!("E:/coding/rust/project/burn_nannou_MNIST/MNIST/{}", path);
+        let dir_path = format!("./MNIST/{}", path);
         let dir = fs::read_dir(dir_path).unwrap();
         for sub_dir in dir {
             let sub_dir = sub_dir.unwrap();
