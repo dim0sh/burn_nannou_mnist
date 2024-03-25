@@ -60,29 +60,19 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
         model.image.ui_vector = vec![0; 28*28];
     }
     if app.keys.down.contains(&Key::E) {
-        let mut image = RgbImage::new(28, 28);
-        for (n, mut pix) in image.enumerate_pixels_mut().enumerate() {
-            let color = model.image.ui_vector[n as usize];
-            pix.2 = &mut image::Rgb([color, color, color]);
+        let mut item = NumbersItem {
+            number: [[0.0; 28 * 28]; 3],
+            label: 0,
+        };
+        for (n, color) in model.image.ui_vector.iter().enumerate() {
+            item.number[0][n] = *color as f32;
+            item.number[1][n] = *color as f32;
+            item.number[2][n] = *color as f32;
         }
         type MyBackend = WgpuBackend<AutoGraphicsApi, f32, i32>;
         let device = burn::backend::wgpu::WgpuDevice::default();
         let artifact_dir = "./tmp";
-        let item = parse_image(image, 1);
         let (predicted, _) = inference::infer::<MyBackend>(artifact_dir, device, item);
         println!("Predicted: {}", predicted);
     }
-}
-
-fn parse_image(image: RgbImage, label: i32) -> NumbersItem {
-    let mut item = NumbersItem {
-        number: [[0.0; 28 * 28]; 3],
-        label,
-    };
-    for (n, pix) in image.pixels().enumerate() {
-        item.number[0][n] = pix.0[0] as f32;
-        item.number[1][n] = pix.0[1] as f32;
-        item.number[2][n] = pix.0[2] as f32;
-    }
-    item
 }
