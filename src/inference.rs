@@ -17,7 +17,7 @@ pub fn infer<B: Backend<IntElem = i32>>(
     let config = TrainingConfig::load(format!("{artifact_dir}/config.json"))
         .expect("Config should exist for the model");
     let record = CompactRecorder::new()
-        .load(format!("{artifact_dir}/model").into(), &device)
+        .load(format!("{artifact_dir}/model").into())
         .expect("Trained model should exist");
 
     let model = config.model.init_with::<B>(record);

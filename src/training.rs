@@ -9,7 +9,7 @@ use burn::{
     nn::loss::CrossEntropyLossConfig,
     optim::AdamConfig,
     record::CompactRecorder,
-    tensor::backend::AutodiffBackend,
+    tensor::backend::ADBackend,
     tensor::{backend::Backend, Int, Tensor},
     train::{
         metric::{AccuracyMetric, LossMetric},
@@ -25,14 +25,14 @@ impl<B: Backend> Model<B> {
     ) -> ClassificationOutput<B> {
         let output = self.forward(images);
         let loss = CrossEntropyLossConfig::new()
-            .init(&output.device())
+            .init()
             .forward(output.clone(), targets.clone());
 
         ClassificationOutput::new(loss, output, targets)
     }
 }
 
-impl<B: AutodiffBackend> TrainStep<NumbersBatch<B>, ClassificationOutput<B>> for Model<B> {
+impl<B: ADBackend> TrainStep<NumbersBatch<B>, ClassificationOutput<B>> for Model<B> {
     fn step(&self, batch: NumbersBatch<B>) -> TrainOutput<ClassificationOutput<B>> {
         let item = self.forward_classification(batch.numbers, batch.labels);
 
@@ -62,7 +62,7 @@ pub struct TrainingConfig {
     pub learning_rate: f64,
 }
 
-pub fn train<B: AutodiffBackend>(artifact_dir: &str, config: TrainingConfig, device: B::Device) {
+pub fn train<B: ADBackend>(artifact_dir: &str, config: TrainingConfig, device: B::Device) {
     std::fs::create_dir_all(artifact_dir).expect("Artifact directory should be created");
     config
         .save(format!("{artifact_dir}/config.json"))

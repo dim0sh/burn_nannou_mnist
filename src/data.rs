@@ -32,13 +32,13 @@ impl<B: Backend> Batcher<NumbersItem, NumbersBatch<B>> for NumbersBatcher<B> {
         let numbers = items
             .iter()
             .map(|item| Data::<f32, 2>::from(item.number).convert())
-            .map(|data| Tensor::<B, 2>::from_data(data, &self.device))
+            .map(|data| Tensor::<B, 2>::from_data(data))
             .map(|tensor| tensor.reshape([1, 28, 28]))
             .map(|tensor| ((tensor / 255) - 0.1307) / 0.3081)
             .collect();
         let labels: Vec<Tensor<B, 1, Int>> = items
             .iter()
-            .map(|item| Tensor::<B, 1, Int>::from_data([(item.label as i64).elem()], &self.device))
+            .map(|item| Tensor::<B, 1, Int>::from_data([(item.label as i64).elem()]))
             .collect();
         let numbers = Tensor::cat(numbers, 0);
         let labels = Tensor::cat(labels, 0);
