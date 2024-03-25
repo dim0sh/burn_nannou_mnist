@@ -1,4 +1,4 @@
-use burn::backend::{wgpu::AutoGraphicsApi};
+use burn::backend::wgpu::AutoGraphicsApi;
 use burn::backend::{WgpuAutodiffBackend, WgpuBackend};
 use burn::optim::AdamConfig;
 use burn_nannou_mnist::data::NumbersDataset;

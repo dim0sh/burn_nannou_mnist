@@ -1,5 +1,5 @@
-use image::{ImageBuffer, RgbImage};
-use burn::backend::{WgpuBackend,{wgpu::AutoGraphicsApi}};
+use image::RgbImage;
+use burn::backend::{WgpuBackend,wgpu::AutoGraphicsApi};
 use nannou::prelude::*;
 use crate::{
     inference,
@@ -12,7 +12,6 @@ struct InputImage {
 
 impl InputImage {
     fn new() -> Self {
-        let image = RgbImage::new(28, 28);
         let ui_vector = vec![0; 28*28];
         InputImage {
             ui_vector,
@@ -48,7 +47,7 @@ pub fn view(app: &App, _model: &GraphModel, frame: Frame) {
     draw.to_frame(app, &frame).unwrap();
 }
 
-pub fn update(app: &App, model: &mut GraphModel, update: Update) {
+pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
     if app.mouse.buttons.left().is_down() {
         let (x, y) = (app.mouse.x, app.mouse.y);
         if x > -(INPUT_SIZE.0 as f32) / 2.0 && x < INPUT_SIZE.0 as f32 / 2.0 && y > (-(INPUT_SIZE.1 as f32) / 2.0) && y < (INPUT_SIZE.1 as f32 / 2.0) {

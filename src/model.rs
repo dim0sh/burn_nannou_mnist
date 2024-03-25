@@ -19,7 +19,7 @@ pub struct ModelConfig {
 }
 
 impl ModelConfig {
-    pub fn init<B: Backend>(&self, device: &B::Device) -> Model<B> {
+    pub fn init<B: Backend>(&self, _device: &B::Device) -> Model<B> {
         Model {
             linear1: LinearConfig::new(28 * 28, self.hidden_size).init(),
             linear2: LinearConfig::new(self.hidden_size, self.num_classes).init(),
