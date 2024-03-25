@@ -63,7 +63,7 @@ pub struct TrainingConfig {
 }
 
 pub fn train<B: AutodiffBackend>(artifact_dir: &str, config: TrainingConfig, device: B::Device) {
-    std::fs::create_dir_all(artifact_dir).ok();
+    std::fs::create_dir_all(artifact_dir).expect("Artifact directory should be created");
     config
         .save(format!("{artifact_dir}/config.json"))
         .expect("Config should be saved successfully");

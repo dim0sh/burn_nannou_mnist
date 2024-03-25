@@ -4,23 +4,28 @@ use burn_nannou_mnist::data::NumbersDataset;
 use burn_nannou_mnist::model::ModelConfig;
 
 fn main() {
+    let artifact_dir = "./tmp";
     type MyBackend = Wgpu<AutoGraphicsApi, f32, i32>;
     type MyAutodiffBackend = Autodiff<MyBackend>;
-
     let device = burn::backend::wgpu::WgpuDevice::default();
-    burn_nannou_mnist::training::train::<MyAutodiffBackend>(
-        "/tmp",
-        burn_nannou_mnist::training::TrainingConfig::new(
-            ModelConfig::new(10, 512),
-            AdamConfig::new(),
-        ),
-        device.clone(),
-    );
+    // enable training by setting train to true
+    let train = false;
+
+    if train {
+        burn_nannou_mnist::training::train::<MyAutodiffBackend>(
+            artifact_dir,
+            burn_nannou_mnist::training::TrainingConfig::new(
+                ModelConfig::new(10, 512),
+                AdamConfig::new(),
+            ),
+            device.clone(),
+        );
+    }
     let mut positive = [0; 10];
     let mut all = [0; 10];
     NumbersDataset::new("test").dataset.iter().for_each(|item| {
         let (predicted, expected) =
-            burn_nannou_mnist::inference::infer::<MyBackend>("/tmp", device.clone(), item.clone());
+            burn_nannou_mnist::inference::infer::<MyBackend>(artifact_dir, device.clone(), item.clone());
             all[expected as usize] += 1;
             if predicted == expected {
                 positive[expected as usize] += 1;
