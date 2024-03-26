@@ -55,8 +55,8 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
             let y = (((y + input_size/2.0)/10.0)-27.0).abs() as u32;
 
             let surrounding = 1;
-            for i in -surrounding..=surrounding {
-                for j in -surrounding..=surrounding {
+            for i in -surrounding..surrounding {
+                for j in -surrounding..surrounding {
                     let x = x as i32 + i;
                     let y = y as i32 + j;
                     if x >= 0 && x < 28 && y >= 0 && y < 28 {
