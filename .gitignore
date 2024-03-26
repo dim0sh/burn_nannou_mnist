@@ -1,4 +1,4 @@
 /target
 /MNIST
-/tmp
+# /tmp
 /tmp.png
