@@ -11,7 +11,7 @@ fn main() {
     type MyAutodiffBackend = WgpuAutodiffBackend<AutoGraphicsApi, f32, i32>;
     let device = burn::backend::wgpu::WgpuDevice::default();
     // enable training by setting train to true
-    let train = true;
+    let train = false;
     let infer_dataset = false;
 
     if train {
