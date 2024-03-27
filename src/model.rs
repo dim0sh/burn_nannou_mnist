@@ -24,6 +24,7 @@ use burn::{
 #[derive(Module, Debug)]
 pub struct Model<B: Backend> {
     conv1: Conv2d<B>,
+    conv2: Conv2d<B>,
     pool: AvgPool2d,
     linear1: Linear<B>,
     linear2: Linear<B>,
@@ -43,8 +44,9 @@ impl ModelConfig {
     pub fn init<B: Backend>(&self, _device: &B::Device) -> Model<B> {
         Model {
             conv1: Conv2dConfig::new([1,4], [3,3],).init(),
+            conv2: Conv2dConfig::new([4,16], [3,3],).init(),
             pool: AvgPool2dConfig::new([8, 8]).init(),
-            linear1: LinearConfig::new(4 * 19 * 19, self.hidden_size).init(),
+            linear1: LinearConfig::new(16 * 17 * 17, self.hidden_size).init(),
             linear2: LinearConfig::new(self.hidden_size, 128).init(),
             dropout: DropoutConfig::new(self.dropout).init(),
             activation: ReLU::new(),
@@ -53,8 +55,9 @@ impl ModelConfig {
     pub fn init_with<B: Backend>(&self, record: ModelRecord<B>) -> Model<B> {
         Model {
             conv1: Conv2dConfig::new([1,4], [3,3],).init_with(record.conv1),
+            conv2: Conv2dConfig::new([4,16], [3,3],).init_with(record.conv2),
             pool: AvgPool2dConfig::new([8, 8]).init(),
-            linear1: LinearConfig::new(4 * 19 * 19, self.hidden_size).init_with(record.linear1),
+            linear1: LinearConfig::new(16 * 17 * 17, self.hidden_size).init_with(record.linear1),
             linear2: LinearConfig::new(self.hidden_size, self.num_classes)
                 .init_with(record.linear2),
             dropout: DropoutConfig::new(self.dropout).init(),
@@ -72,9 +75,12 @@ impl<B: Backend> Model<B> {
         let x = self.conv1.forward(x);
         let x = self.dropout.forward(x);
         let x = self.activation.forward(x);
+        let x = self.conv2.forward(x);
+        let x = self.dropout.forward(x);
+        let x = self.activation.forward(x);
 
         let x = self.pool.forward(x);
-        let x = x.reshape([batch_size, 4 * 19 * 19]);
+        let x = x.reshape([batch_size, 16 * 17 * 17]);
 
         let x = self.linear1.forward(x);
         // let x = self.dropout.forward(x);

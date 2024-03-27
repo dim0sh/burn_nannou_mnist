@@ -11,9 +11,9 @@ fn main() {
     type MyAutodiffBackend = WgpuAutodiffBackend<AutoGraphicsApi, f32, i32>;
     let device = burn::backend::wgpu::WgpuDevice::default();
     // enable training by setting train to true
-    let train = false;
-    let batch_infer_dataset = false;
-    let ui_bool = true;
+    let train = true;
+    let batch_infer_dataset = true;
+    let ui_bool = false;
 
     if train {
         burn_nannou_mnist::training::train::<MyAutodiffBackend>(
