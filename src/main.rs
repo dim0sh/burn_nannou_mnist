@@ -13,6 +13,7 @@ fn main() {
     // enable training by setting train to true
     let train = false;
     let batch_infer_dataset = false;
+    let ui_bool = true;
 
     if train {
         burn_nannou_mnist::training::train::<MyAutodiffBackend>(
@@ -29,10 +30,13 @@ fn main() {
         let items = NumbersDataset::new("test").dataset.into_iter().collect::<Vec<NumbersItem>>();
         burn_nannou_mnist::inference::infer_batch::<MyBackend>(artifact_dir, device.clone(), items);
     }
-    nannou::app(app::model)
-        .view(app::view)
-        .update(app::update)
-        .run();
+    if ui_bool {
+        nannou::app(app::model)
+            .view(app::view)
+            .update(app::update)
+            .run();
+
+    }
     
 }
 

@@ -1,7 +1,8 @@
 {
   "model": {
     "num_classes": 10,
-    "hidden_size": 512
+    "hidden_size": 512,
+    "dropout": 0.5
   },
   "optimizer": {
     "weight_decay": null,
