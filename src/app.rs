@@ -9,15 +9,18 @@ use crate::{
 struct InputImage {
     ui_image: RgbImage,
     image_pos_size: (Vec2, f32),
+    prediction: i32,
 }
 
 impl InputImage {
     fn new() -> Self {
         let ui_image = RgbImage::new(28, 28);
         let image_pos_size = (Vec2::new(0.0, 0.0), 280.0);
+        let prediction = -1;
         InputImage {
             ui_image,
             image_pos_size,
+            prediction,
         }
     }
 }
@@ -42,14 +45,21 @@ pub fn view(app: &App, model: &GraphModel, frame: Frame) {
     draw.texture(&nannou::wgpu::Texture::from_image(app, &img))
         .w_h(model.image.image_pos_size.1, model.image.image_pos_size.1)
         .xy(model.image.image_pos_size.0);
+    draw.text("[C] Clear Image").color(BLACK).x_y(0.0, -150.0).font_size(20);
+    draw.text("[E] Predict").color(BLACK).x_y(0.0, -180.0).font_size(20);
+    let prediction = model.image.prediction;
+    if prediction != -1 {
+        draw.text(&format!("Prediction: {}", prediction)).color(BLACK).x_y(0.0, -210.0).font_size(20);
+    }
     draw.to_frame(app, &frame).unwrap();
 }
 
 pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
     let input_size = model.image.image_pos_size.1;
+    // let input_position = model.image.image_pos_size.0;
     if app.mouse.buttons.left().is_down() {
         let (x, y) = (app.mouse.x, app.mouse.y);
-        if x > -(input_size/2.0) && x < (input_size/2.0) && y > -(input_size/2.0) && y < (input_size/2.0) {
+        if x > (-(input_size/2.0)) && x < (input_size/2.0) && y > (-(input_size/2.0)) && y < (input_size/2.0) {
             let x = ((x + input_size/2.0)/10.0)as u32;
             let y = (((y + input_size/2.0)/10.0)-27.0).abs() as u32;
 
@@ -75,7 +85,6 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
             number: [[0.0; 28 * 28]; 3],
             label: 0,
         };
-        model.image.ui_image.save("./tmp.png").unwrap();
         
         for (n, color) in model.image.ui_image.pixels().enumerate() {
             item.number[0][n] = color.0[0] as f32;
@@ -85,9 +94,7 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
         type MyBackend = WgpuBackend<AutoGraphicsApi, f32, i32>;
         let device = burn::backend::wgpu::WgpuDevice::default();
         let artifact_dir = "./tmp";
-        let start = std::time::Instant::now();
         let (predicted, _) = inference::infer::<MyBackend>(artifact_dir, device, item);
-        println!("Inference time: {:?}", start.elapsed());
-        println!("Predicted: {}", predicted);
+        model.image.prediction = predicted;
     }
 }

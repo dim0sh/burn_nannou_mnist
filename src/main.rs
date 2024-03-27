@@ -12,7 +12,7 @@ fn main() {
     let device = burn::backend::wgpu::WgpuDevice::default();
     // enable training by setting train to true
     let train = false;
-    let batch_infer_dataset = true;
+    let batch_infer_dataset = false;
 
     if train {
         burn_nannou_mnist::training::train::<MyAutodiffBackend>(
