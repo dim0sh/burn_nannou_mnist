@@ -3,7 +3,7 @@ use burn::backend::{wgpu::AutoGraphicsApi, WgpuBackend};
 use nannou::{prelude::*, image::RgbImage};
 use crate::{
     inference,
-    data::NumbersItem
+    data,
 };
 
 struct InputImage {
@@ -50,20 +50,19 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
     if app.mouse.buttons.left().is_down() {
         let (x, y) = (app.mouse.x, app.mouse.y);
         if x > -(input_size/2.0) && x < (input_size/2.0) && y > -(input_size/2.0) && y < (input_size/2.0) {
-            println!("x:{},y:{}",x, y);
             let x = ((x + input_size/2.0)/10.0)as u32;
             let y = (((y + input_size/2.0)/10.0)-27.0).abs() as u32;
 
-            let surrounding = 1;
-            for i in -surrounding..surrounding {
-                for j in -surrounding..surrounding {
-                    let x = x as i32 + i;
-                    let y = y as i32 + j;
-                    if x >= 0 && x < 28 && y >= 0 && y < 28 {
-                        model.image.ui_image.put_pixel(x as u32, y as u32, nannou::image::Rgb([222, 222, 222]));
-                    }
-                }
-            }
+            // let surrounding = 1;
+            // for i in -surrounding..surrounding {
+            //     for j in -surrounding..surrounding {
+            //         let x = x as i32 + i;
+            //         let y = y as i32 + j;
+            //         if x >= 0 && x < 28 && y >= 0 && y < 28 {
+            //             model.image.ui_image.put_pixel(x as u32, y as u32, nannou::image::Rgb([222, 222, 222]));
+            //         }
+            //     }
+            // }
 
             model.image.ui_image.put_pixel(x, y, nannou::image::Rgb([255, 255, 255]));
         }
@@ -72,7 +71,7 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
         model.image.ui_image = RgbImage::new(28, 28);
     }
     if app.keys.down.contains(&Key::E) {
-        let mut item = NumbersItem {
+        let mut item = data::NumbersItem {
             number: [[0.0; 28 * 28]; 3],
             label: 0,
         };
@@ -86,7 +85,9 @@ pub fn update(app: &App, model: &mut GraphModel, _update: Update) {
         type MyBackend = WgpuBackend<AutoGraphicsApi, f32, i32>;
         let device = burn::backend::wgpu::WgpuDevice::default();
         let artifact_dir = "./tmp";
+        let start = std::time::Instant::now();
         let (predicted, _) = inference::infer::<MyBackend>(artifact_dir, device, item);
+        println!("Inference time: {:?}", start.elapsed());
         println!("Predicted: {}", predicted);
     }
 }

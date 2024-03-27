@@ -1,8 +1,9 @@
 use burn::{
-    data::{dataloader::batcher::Batcher, dataset::Dataset},
-    tensor::{backend::Backend, Data, ElementConversion, Int, Tensor},
+    data::{dataloader::batcher::Batcher, dataset::Dataset}, tensor::{backend::Backend, Data, ElementConversion, Int, Tensor}
 };
+
 use image;
+use nannou::rand::random_range;
 use rayon::prelude::*;
 use std::fs::{self, DirEntry};
 
@@ -46,7 +47,7 @@ impl<B: Backend> Batcher<NumbersItem, NumbersBatch<B>> for NumbersBatcher<B> {
         NumbersBatch { numbers, labels }
     }
 }
-
+#[derive(Debug, Clone)]
 pub struct NumbersDataset {
     pub dataset: Vec<NumbersItem>,
 }
@@ -103,6 +104,73 @@ impl NumbersDataset {
             item.number[0][n] = pix.0[0] as f32;
             item.number[1][n] = pix.0[1] as f32;
             item.number[2][n] = pix.0[2] as f32;
+        }
+        item
+    }
+    pub fn blur_dataset(&mut self) -> Self{
+        let new_data = self.dataset.clone();
+            
+        new_data
+            .iter()
+            .take(10000)
+            .par_bridge()
+            .map(|item| NumbersDataset::blur_filter(item.clone()))
+            .collect::<Vec<NumbersItem>>();
+
+        self.dataset.extend(new_data);
+        self.clone()
+    }
+
+    pub fn noise_dataset(&mut self) -> Self{
+        let new_data = self.dataset.clone();
+        new_data
+            .iter()
+            .take(10000)
+            .par_bridge()
+            .map(|item| NumbersDataset::noise_filter(item.clone()))
+            .collect::<Vec<NumbersItem>>();
+
+        self.dataset.extend(new_data);
+        self.clone()
+    }
+
+    pub fn blur_filter(image: NumbersItem) -> NumbersItem {
+        let mut item = NumbersItem {
+            number: [[0.0; 28 * 28]; 3],
+            label: image.label,
+        };
+        
+        for i in 0..3 {
+            for j in 0..28 {
+                for k in 0..28 {
+                    let mut sum = 0.0;
+                    for x in -1..2 {
+                        for y in -1..2 {
+                            let x = j as i32 + x;
+                            let y = k as i32 + y;
+                            if x >= 0 && x < 28 && y >= 0 && y < 28 {
+                                sum += image.number[i][y as usize * 28 + x as usize]
+                            }
+                        }
+                    }
+                    item.number[i][j * 28 + k] = sum / 9.0;
+                }
+            }
+        }
+        item
+    }
+
+    fn noise_filter(image: NumbersItem) -> NumbersItem {
+        let mut item = NumbersItem {
+            number: [[0.0; 28 * 28]; 3],
+            label: image.label,
+        };
+        for i in 0..3 {
+            for j in 0..28 {
+                for k in 0..28 {
+                    item.number[i][j * 28 + k] = (image.number[i][j * 28 + k] + random_range(0.0, 255.0) * 0.1)%255.0;
+                }
+            }
         }
         item
     }
